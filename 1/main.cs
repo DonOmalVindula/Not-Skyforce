@@ -26,7 +26,7 @@ function MoveToToy::create( %this )
     echo("Game Start");
     MoveToToy.moveSpeed = 110;
     MoveToToy.trackMouse = true;
-
+    MoveToToy.Music = "MoveToToy:titleMusic";
     // Add the custom controls.
     addNumericOption("Move Speed", 1, 150, 1, "setMoveSpeed", MoveToToy.moveSpeed, true, "Sets the linear speed to use when moving to the target position.");
     addFlagOption("Track Mouse", "setTrackMouse", MoveToToy.trackMouse, false, "Whether to track the position of the mouse or not." );
@@ -39,6 +39,7 @@ function MoveToToy::create( %this )
 
 function MoveToToy::destroy( %this )
 {
+    alxStopAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ function MoveToToy::reset( %this )
     // Create background.
     %this.createBackground();
     %this.createFarScroller();
-
+    alxPlay(MoveToToy.Music);
 
     // Create target.
     %this.createTarget();
