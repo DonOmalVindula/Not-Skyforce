@@ -248,7 +248,7 @@ function MoveToToy::createBullet( %this, %position )
     %object.Image = "MoveToToy:Bullet";
     %object.ImageFrame = getRandom(0,3);
     %object.SceneLayer = 10;
-    %object.setDefaultDensity( 0.2 );
+    %object.setDefaultDensity( 0 );
     %object.createCircleCollisionShape( 4 * 0.4 );
     %object.setLinearVelocity( 0, 40 );
     %object.setLifetime( 1.7 );  
@@ -267,10 +267,10 @@ function MoveToToy::createEnemy ( %this )
     };
     %object.Position = %position;
     %object.Size = 5;
-    %object.Image = "MoveToToy:Tires";
-    %object.AngularVelocity = -5;
+    %object.Image = "MoveToToy:Enemy";
+    %object.AngularVelocity = 0 ;
     %object.setLinearVelocity( 0, -10 ); 
-    %object.setDefaultDensity( 10 );
+    %object.setDefaultDensity( 1000 );
     %object.createCircleCollisionShape( 5 * 0.48 );
     %object.CollisionCallback = true;
     %this.objectTemplate = %object;
@@ -369,28 +369,29 @@ function MoveToToy::createMoveTowardBehavior(%this)
 
 function Enemy::onCollision( %this, %object, %collisionDetails )
 {
-    // %positionDelta = Vector2Sub( %object.Position, %this.Position );
-    // %angle = -mRadToDeg( mAtan( %positionDelta._0, %positionDelta._1 ) );
+    %positionDelta = Vector2Sub( %object.Position, %this.Position );
+    %angle = -mRadToDeg( mAtan( %positionDelta._0, %positionDelta._1 ) );
     
-    // // Fetch contact position.
-    // %contactPosition = %collisionDetails._4 SPC %collisionDetails._5;
+    // Fetch contact position.
+    %contactPosition = %collisionDetails._4 SPC %collisionDetails._5;
     
-    // // Calculate total impact force.
-    // %impactForce = mAbs(%collisionDetails._6 / 100) + mAbs(%collisionDetails._7 / 20);
+    // Calculate total impact force.
+    %impactForce = mAbs(%collisionDetails._6 / 100) + mAbs(%collisionDetails._7 / 20);
     
-    // // Create explosion.
-    // %player = new ParticlePlayer();
-    // %player.BodyType = static;
-    // %player.Particle = "MoveToToy:impactExplosion";
-    // %player.Position = %contactPosition;
-    // %player.Angle = %angle;
-    // %player.SizeScale = mClamp( %impactForce, 0.1, 10 );
-    // %player.SceneLayer = 0;
-    // SandboxScene.add( %player );
+    // Create explosion.
+    %player = new ParticlePlayer();
+    %player.BodyType = static;
+    %player.Particle = "ToyAssets:impactExplosion";
+    %player.Position = %contactPosition;
+    %player.Angle = %angle;
+    %player.SizeScale = mClamp( %impactForce, 0.1, 10 );
+    %player.SceneLayer = 0;
+    SandboxScene.add( %player );  
 
     // Delete the bullet.
     //echo("Hello");
     %object.safeDelete();
+    %this.safeDelete();
     // %object.Trail.LinearVelocity = 0;
     // %object.AngularVelocity = 0;
     // %object.Trail.safeDelete();
