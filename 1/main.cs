@@ -24,7 +24,7 @@ function MoveToToy::create( %this )
 {
     // Initialize the toys settings.
     echo("Game Start");
-    MoveToToy.moveSpeed = 50;
+    MoveToToy.moveSpeed = 110;
     MoveToToy.trackMouse = true;
 
     // Add the custom controls.
@@ -82,7 +82,7 @@ function MoveToToy::createBackground( %this )
     %object.SceneLayer = 31;
     
     // Set an image.
-    %object.Image = "MoveToToy:highlightBackground";
+    %object.Image = "MoveToToy:skyBackground";
     
     // Set the blend color.
     //%object.BlendColor = SlateGray;
@@ -105,13 +105,13 @@ function MoveToToy::createFarScroller( %this )
     %object.Position = "0 -10";
 
     // Set the size.        
-    %object.Size = "100 75";
+    %object.Size = "100 100";
 
     // Set to the furthest background layer.
     %object.SceneLayer = 31;
     
     // Set the scroller to use a static image.
-    %object.Image = "MoveToToy:clouds";
+    %object.Image = "MoveToToy:checkered";
     
     // We don't really need to do this as the frame is set to zero by default.
     %object.Frame = 0;
@@ -120,7 +120,7 @@ function MoveToToy::createFarScroller( %this )
     %object.ScrollY = 25;
     
     // Set the scroller to only show half of the static image in the X axis.
-    %object.RepeatX = 0.5;
+    %object.RepeatX = 1.0;
         
     // Add the sprite to the scene.
     SandboxScene.add( %object );    
@@ -140,19 +140,19 @@ function MoveToToy::createSight( %this )
     %object.Image = "MoveToToy:spaceship";
 
     // Set the blend color.
-    %object.BlendColor = Lime;
+    //%object.BlendColor = Lime;
     
     // Set the transparency.
-    %object.setBlendAlpha( 0.5 );
+    %object.setBlendAlpha( 1.0 );
     
     // Set a useful size.
-    %object.Size = 40;
+    %object.Size = 11;
     
     // Set the sprite rotating to make it more interesting.
-    %object.AngularVelocity = -90;
+    %object.AngularVelocity = 0;
     
     // Add to the scene.
-    //SandboxScene.add( %object );    
+    SandboxScene.add( %object );    
 }
 
 //-----------------------------------------------------------------------------
@@ -178,7 +178,7 @@ function MoveToToy::createTarget( %this )
     %object.AngularVelocity = 0;
     
     // Add to the scene.
-    SandboxScene.add( %object );    
+    //SandboxScene.add( %object );    
 }
 
 //-----------------------------------------------------------------------------
