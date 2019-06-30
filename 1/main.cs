@@ -251,7 +251,7 @@ function MoveToToy::createBullet( %this, %position )
     %object.setDefaultDensity( 0.2 );
     %object.createCircleCollisionShape( 4 * 0.4 );
     %object.setLinearVelocity( 0, 40 );
-    %object.setLifetime( 2 );  
+    %object.setLifetime( 1.7 );  
     SandboxScene.add( %object );
 }
 
@@ -282,12 +282,24 @@ function MoveToToy::createEnemy ( %this )
 
 function MoveToToy::setupSpawnPoints(%this)
 {
-    %amount = 600 / 6;
+    %amount = 3;
 
     // Creating four in the corners of the space
     %this.createSpawnPoint("-30 40", %amount);
     %this.createSpawnPoint("0 40", %amount);
     %this.createSpawnPoint("30 40", %amount);
+
+    %this.createSpawnPoint("-25 80", %amount);
+    %this.createSpawnPoint("10 80", %amount);
+    %this.createSpawnPoint("30 80", %amount);
+ 
+    %this.createSpawnPoint("-32 120", %amount);
+    %this.createSpawnPoint("0 120", %amount);
+    %this.createSpawnPoint("24 120", %amount);
+ 
+    %this.createSpawnPoint("-25 160", %amount);
+    %this.createSpawnPoint("0 160", %amount);
+    %this.createSpawnPoint("18 160", %amount);
 }
 
 function MoveToToy::createSpawnPoint(%this, %position, %amount)
