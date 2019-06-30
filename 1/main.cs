@@ -417,7 +417,8 @@ function Enemy::onCollision( %this, %object, %collisionDetails )
     %player.Angle = %angle;
     %player.SizeScale = mClamp( %impactForce, 0.1, 10 );
     %player.SceneLayer = 0;
-    SandboxScene.add( %player );  
+    SandboxScene.add( %player ); 
+    alxPlay(MoveToToy.FireMusic); 
 
     // Delete the bullet.
     //echo("Hello");
