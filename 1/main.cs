@@ -52,7 +52,7 @@ function MoveToToy::reset( %this )
     // Create background.
     %this.createBackground();
     %this.createFarScroller();
-    alxPlay(MoveToToy.Music);
+    //alxPlay(MoveToToy.Music);
 
     // Create target.
     %this.createTarget();
