@@ -111,7 +111,7 @@ function MoveToToy::createFarScroller( %this )
     %object.SceneLayer = 31;
     
     // Set the scroller to use a static image.
-    %object.Image = "MoveToToy:TreeBackground2";
+    %object.Image = "MoveToToy:clouds";
     
     // We don't really need to do this as the frame is set to zero by default.
     %object.Frame = 0;
@@ -137,7 +137,7 @@ function MoveToToy::createSight( %this )
     MoveToToy.SightObject = %object;
     
     // Set the static image.
-    %object.Image = "MoveToToy:Crosshair2";
+    %object.Image = "MoveToToy:spaceship";
 
     // Set the blend color.
     %object.BlendColor = Lime;
@@ -152,7 +152,7 @@ function MoveToToy::createSight( %this )
     %object.AngularVelocity = -90;
     
     // Add to the scene.
-    SandboxScene.add( %object );    
+    //SandboxScene.add( %object );    
 }
 
 //-----------------------------------------------------------------------------
@@ -166,16 +166,16 @@ function MoveToToy::createTarget( %this )
     MoveToToy.TargetObject = %object;
     
     // Set the static image.
-    %object.Image = "MoveToToy:Crosshair3";
+    %object.Image = "MoveToToy:spaceship";
     
     // Set the blend color.
     %object.BlendColor = DarkOrange;
     
     // Set a useful size.
-    %object.Size = 20;
+    %object.Size = 10;
         
     // Set the sprite rotating to make it more interesting.
-    %object.AngularVelocity = 60;
+    %object.AngularVelocity = 0;
     
     // Add to the scene.
     SandboxScene.add( %object );    
