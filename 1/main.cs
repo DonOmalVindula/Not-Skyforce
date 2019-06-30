@@ -31,6 +31,7 @@ function MoveToToy::create( %this )
     MoveToToy.trackMouse = true;
     MoveToToy.Music = "MoveToToy:titleMusic";
     MoveToToy.FireMusic = "MoveToToy:gunFire";
+    MoveToToy.Score = 0;
     // Add the custom controls.
     addNumericOption("Move Speed", 1, 150, 1, "setMoveSpeed", MoveToToy.moveSpeed, true, "Sets the linear speed to use when moving to the target position.");
     addFlagOption("Track Mouse", "setTrackMouse", MoveToToy.trackMouse, false, "Whether to track the position of the mouse or not." );
@@ -54,11 +55,13 @@ function MoveToToy::reset( %this )
 {
     // Clear the scene.
     SandboxScene.clear();
+
+    %this.Score = 0;
     
     // Create background.
     %this.createBackground();
     %this.createFarScroller();
-    //alxPlay(MoveToToy.Music);
+    alxPlay(MoveToToy.Music);
 
     // Create target.
     %this.createTarget();
@@ -282,9 +285,17 @@ function MoveToToy::createEnemy ( %this )
 
 function MoveToToy::setupSpawnPoints(%this)
 {
-    %amount = 3;
+    %amount = 5;
+    // %spawners = 340;
+    // %n=0;
 
-    // Creating four in the corners of the space
+    // for( %n = 40; %n <= 340; %n+=40; )
+    // {        
+    //     %this.createSpawnPoint("-30 %n", %amount);
+    //     %this.createSpawnPoint("0 %n", %amount);
+    //     %this.createSpawnPoint("30 %n", %amount);
+    // }
+
     %this.createSpawnPoint("-30 40", %amount);
     %this.createSpawnPoint("0 40", %amount);
     %this.createSpawnPoint("30 40", %amount);
@@ -300,6 +311,23 @@ function MoveToToy::setupSpawnPoints(%this)
     %this.createSpawnPoint("-25 160", %amount);
     %this.createSpawnPoint("0 160", %amount);
     %this.createSpawnPoint("18 160", %amount);
+
+    %this.createSpawnPoint("-30 200", %amount);
+    %this.createSpawnPoint("0 200", %amount);
+    %this.createSpawnPoint("30 200", %amount);
+
+    %this.createSpawnPoint("-25 240", %amount);
+    %this.createSpawnPoint("10 240", %amount);
+    %this.createSpawnPoint("30 240", %amount);
+ 
+    %this.createSpawnPoint("-32 280", %amount);
+    %this.createSpawnPoint("0 280", %amount);
+    %this.createSpawnPoint("24 280", %amount);
+ 
+    %this.createSpawnPoint("-25 320", %amount);
+    %this.createSpawnPoint("0 320", %amount);
+    %this.createSpawnPoint("18 320", %amount);
+
 }
 
 function MoveToToy::createSpawnPoint(%this, %position, %amount)
@@ -371,6 +399,9 @@ function Enemy::onCollision( %this, %object, %collisionDetails )
 {
     %positionDelta = Vector2Sub( %object.Position, %this.Position );
     %angle = -mRadToDeg( mAtan( %positionDelta._0, %positionDelta._1 ) );
+
+    MoveToToy.Score++;
+    echo(MoveToToy.Score);
     
     // Fetch contact position.
     %contactPosition = %collisionDetails._4 SPC %collisionDetails._5;
@@ -392,8 +423,4 @@ function Enemy::onCollision( %this, %object, %collisionDetails )
     //echo("Hello");
     %object.safeDelete();
     %this.safeDelete();
-    // %object.Trail.LinearVelocity = 0;
-    // %object.AngularVelocity = 0;
-    // %object.Trail.safeDelete();
-    // %object.safeDelete();  
 }
