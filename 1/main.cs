@@ -24,13 +24,19 @@ function MoveToToy::create( %this )
 {
     // Initialize the toys settings.
     echo("Game Start");
+    exec("./scripts/faceObjectBehavior.cs");
+    exec("./scripts/moveTowardBehavior.cs");
+    exec("./scripts/spawnAreaBehavior.cs");
     MoveToToy.moveSpeed = 110;
     MoveToToy.trackMouse = true;
     MoveToToy.Music = "MoveToToy:titleMusic";
+    MoveToToy.FireMusic = "MoveToToy:gunFire";
     // Add the custom controls.
     addNumericOption("Move Speed", 1, 150, 1, "setMoveSpeed", MoveToToy.moveSpeed, true, "Sets the linear speed to use when moving to the target position.");
     addFlagOption("Track Mouse", "setTrackMouse", MoveToToy.trackMouse, false, "Whether to track the position of the mouse or not." );
 
+    %this.createSpawnAreaBehavior();
+    %this.createMoveTowardBehavior();
     // Reset the toy initially.
     MoveToToy.reset();        
 }
@@ -60,8 +66,11 @@ function MoveToToy::reset( %this )
     // Create sight.
     %this.createSight();
 
-    %this.startTimer( "createAsteroid", 200 );
-    %this.startTimer( "createEnemy", 3000 );
+    %this.startTimer( "createBullet", 200 );
+    %this.createEnemy();
+
+    %this.setupSpawnPoints();
+    //%this.startTimer( "createEnemy", 500 );
 }
 
 //-----------------------------------------------------------------------------
@@ -148,12 +157,14 @@ function MoveToToy::createSight( %this )
     
     // Set the transparency.
     %object.setBlendAlpha( 1.0 );
+    %object.setDefaultDensity( 10000 );
     
     // Set a useful size.
     %object.Size = 11;
     
     // Set the sprite rotating to make it more interesting.
     %object.AngularVelocity = 0;
+    //%object.createCircleCollisionShape( 11 * 0.48 );
     
     // Add to the scene.
     SandboxScene.add( %object );    
@@ -227,10 +238,11 @@ function MoveToToy::onTouchDragged(%this, %touchID, %worldPosition)
 
 //-----------------------------------------------------------------------------
 
-function MoveToToy::createAsteroid( %this, %position )
+function MoveToToy::createBullet( %this, %position )
 {
-    // Create an asteroid.
+    // Create an Bullet.
     %object = new Sprite();
+    //alxPlay(MoveToToy.titleMusic);
     %object.Position = MoveToToy.SightObject.Position;
     %object.Size = 4;
     %object.Image = "MoveToToy:Bullet";
@@ -258,10 +270,87 @@ function MoveToToy::createEnemy ( %this )
     %object.Image = "MoveToToy:Tires";
     %object.AngularVelocity = -5;
     %object.setLinearVelocity( 0, -10 ); 
-    %object.setDefaultDensity( 10000 );
+    %object.setDefaultDensity( 10 );
     %object.createCircleCollisionShape( 5 * 0.48 );
     %object.CollisionCallback = true;
-    SandboxScene.add( %object );    
+    %this.objectTemplate = %object;
+
+    SandboxScene.add( %objectTemplate );   
+    %this.objectTemplate.setEnabled(0);
+    
+}
+
+function MoveToToy::setupSpawnPoints(%this)
+{
+    %amount = 600 / 6;
+
+    // Creating four in the corners of the space
+    %this.createSpawnPoint("-30 40", %amount);
+    %this.createSpawnPoint("0 40", %amount);
+    %this.createSpawnPoint("30 40", %amount);
+}
+
+function MoveToToy::createSpawnPoint(%this, %position, %amount)
+{
+    %spawnPoint = new sceneObject()
+    {
+        size = "10 10";
+        position = %position;
+    };
+
+    %spawnPointBehavior = %this.spawnAreaBehavior.createInstance();
+    %spawnPointBehavior.initialize(%this.objectTemplate, %amount, 0.5, 0, true, "Area");
+    %spawnPoint.addBehavior(%spawnPointBehavior);
+
+    SandboxScene.add(%spawnPoint);
+
+}
+
+function MoveToToy::createSpawnAreaBehavior(%this)
+{
+    // Create the named template and retain it as a custom field on this toy
+    %this.spawnAreaBehavior = new BehaviorTemplate(SpawnAreaBehavior);
+
+    // Fill in the details of the behavior
+    %this.spawnAreaBehavior.friendlyName = "Spawn Area";
+    %this.spawnAreaBehavior.behaviorType = "AI";
+    %this.spawnAreaBehavior.description  = "Spawns objects inside the area of this object";
+
+    // Add the custom behavior fields
+    %this.spawnAreaBehavior.addBehaviorField(object, "The object to clone", object, "", sceneObject);
+    %this.spawnAreaBehavior.addBehaviorField(count, "The number of objects to clone (-1 for infinite)", int, 50);
+    %this.spawnAreaBehavior.addBehaviorField(spawnTime, "The time between spawns (seconds)", float, 2.0);
+    %this.spawnAreaBehavior.addBehaviorField(spawnVariance, "The variance in the spawn time (seconds)", float, 1.0);
+    %this.spawnAreaBehavior.addBehaviorField(autoSpawn, "Automatically start/stop spawning", bool, true);
+
+    %spawnLocations = "Area" TAB "Edges" TAB "Center" TAB "Top" TAB "Bottom" TAB "Left" TAB "Right";
+    %this.spawnAreaBehavior.addBehaviorField(spawnLocation, "The are in which objects can be spawned", enum, "Area", %spawnLocations);
+
+    // Add the BehaviorTemplate to the scope set so it is destroyed when the module is unloaded
+    MoveToToy.add(%this.spawnAreaBehavior);
+}
+
+function MoveToToy::setSpawnAmount(%this, %value)
+{
+    %this.spawnAmount = %value;
+}
+
+function MoveToToy::createMoveTowardBehavior(%this)
+{
+    // Create the named template and retain it as a custom field on this toy
+    %this.moveTowardBehavior = new BehaviorTemplate(MoveTowardBehavior);
+
+    // Fill in the details of the behavior
+    %this.moveTowardBehavior.friendlyName = "Move Toward";
+    %this.moveTowardBehavior.behaviorType = "AI";
+    %this.moveTowardBehavior.description  = "Set the object to move toward another object";
+
+    // Add the custom behavior fields
+    %this.moveTowardBehavior.addBehaviorField(target, "The object to move toward", object, "", sceneObject);
+    %this.moveTowardBehavior.addBehaviorField(speed, "The speed to move toward the object at (world units per second)", float, 2.0);
+
+    // Add the BehaviorTemplate to the scope set so it is destroyed when the module is unloaded
+    MoveToToy.add(%this.moveTowardBehavior);
 }
 
 //----------------------------------------------------------
@@ -288,8 +377,10 @@ function Enemy::onCollision( %this, %object, %collisionDetails )
     // SandboxScene.add( %player );
 
     // Delete the bullet.
-    %object.Trail.LinearVelocity = 0;
-    %object.Trail.AngularVelocity = 0;
-    %object.Trail.safeDelete();
-    %object.safeDelete();  
+    //echo("Hello");
+    %object.safeDelete();
+    // %object.Trail.LinearVelocity = 0;
+    // %object.AngularVelocity = 0;
+    // %object.Trail.safeDelete();
+    // %object.safeDelete();  
 }
