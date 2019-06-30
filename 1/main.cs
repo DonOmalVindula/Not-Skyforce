@@ -59,6 +59,9 @@ function MoveToToy::reset( %this )
     
     // Create sight.
     %this.createSight();
+
+    %this.startTimer( "createAsteroid", 200 );
+    %this.startTimer( "createEnemy", 3000 );
 }
 
 //-----------------------------------------------------------------------------
@@ -198,14 +201,14 @@ function MoveToToy::setTrackMouse( %this, %value )
 
 //-----------------------------------------------------------------------------
 
-function MoveToToy::onTouchDown(%this, %touchID, %worldPosition)
-{
-    // Set the target to the touched position.
-    MoveToToy.TargetObject.Position = %worldPosition;
+// function MoveToToy::onTouchDown(%this, %touchID, %worldPosition)
+// {
+//     // Set the target to the touched position.
+//     MoveToToy.TargetObject.Position = %worldPosition;
     
-    // Move the sight to the touched position.
-    MoveToToy.SightObject.MoveTo( %worldPosition, MoveToToy.moveSpeed );
-}
+//     // Move the sight to the touched position.
+//     MoveToToy.SightObject.MoveTo( %worldPosition, MoveToToy.moveSpeed );
+// }
 
 //-----------------------------------------------------------------------------
 
@@ -220,4 +223,73 @@ function MoveToToy::onTouchDragged(%this, %touchID, %worldPosition)
     
     // Move the sight to the touched position.
     MoveToToy.SightObject.MoveTo( %worldPosition, MoveToToy.moveSpeed );     
+}
+
+//-----------------------------------------------------------------------------
+
+function MoveToToy::createAsteroid( %this, %position )
+{
+    // Create an asteroid.
+    %object = new Sprite();
+    %object.Position = MoveToToy.SightObject.Position;
+    %object.Size = 4;
+    %object.Image = "MoveToToy:Bullet";
+    %object.ImageFrame = getRandom(0,3);
+    %object.SceneLayer = 10;
+    %object.setDefaultDensity( 0.2 );
+    %object.createCircleCollisionShape( 4 * 0.4 );
+    %object.setLinearVelocity( 0, 40 );
+    %object.setLifetime( 2 );  
+    SandboxScene.add( %object );
+}
+
+//-----------------------------------------------------------------------------
+
+function MoveToToy::createEnemy ( %this )
+{
+    %position = "0 50";
+
+    %object = new Sprite()
+    {
+        class = "Enemy";
+    };
+    %object.Position = %position;
+    %object.Size = 5;
+    %object.Image = "MoveToToy:Tires";
+    %object.AngularVelocity = -5;
+    %object.setLinearVelocity( 0, -10 ); 
+    %object.setDefaultDensity( 10000 );
+    %object.createCircleCollisionShape( 5 * 0.48 );
+    %object.CollisionCallback = true;
+    SandboxScene.add( %object );    
+}
+
+//----------------------------------------------------------
+
+function Enemy::onCollision( %this, %object, %collisionDetails )
+{
+    // %positionDelta = Vector2Sub( %object.Position, %this.Position );
+    // %angle = -mRadToDeg( mAtan( %positionDelta._0, %positionDelta._1 ) );
+    
+    // // Fetch contact position.
+    // %contactPosition = %collisionDetails._4 SPC %collisionDetails._5;
+    
+    // // Calculate total impact force.
+    // %impactForce = mAbs(%collisionDetails._6 / 100) + mAbs(%collisionDetails._7 / 20);
+    
+    // // Create explosion.
+    // %player = new ParticlePlayer();
+    // %player.BodyType = static;
+    // %player.Particle = "MoveToToy:impactExplosion";
+    // %player.Position = %contactPosition;
+    // %player.Angle = %angle;
+    // %player.SizeScale = mClamp( %impactForce, 0.1, 10 );
+    // %player.SceneLayer = 0;
+    // SandboxScene.add( %player );
+
+    // Delete the bullet.
+    %object.Trail.LinearVelocity = 0;
+    %object.Trail.AngularVelocity = 0;
+    %object.Trail.safeDelete();
+    %object.safeDelete();  
 }
