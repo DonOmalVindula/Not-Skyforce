@@ -28,6 +28,8 @@ function MoveToToy::create( %this )
     exec("./scripts/moveTowardBehavior.cs");
     exec("./scripts/spawnAreaBehavior.cs");
     MoveToToy.moveSpeed = 110;
+    MoveToToy.count = 0;
+	MoveToToy.livesLeft = 3;
     MoveToToy.trackMouse = true;
     MoveToToy.Music = "MoveToToy:titleMusic";
     MoveToToy.FireMusic = "MoveToToy:gunFire";
@@ -49,6 +51,134 @@ function MoveToToy::destroy( %this )
     alxStopAll();
 }
 
+function MoveToToy::createEndBox( %this )
+{
+	// Create the sprite.
+	%object = new Sprite()
+	{
+    	class = "EndBox";
+	};
+	%object.BodyType = static;
+	%object.Position = "0 -40";
+	%object.Layer = 30;
+	%object.Size = 100 SPC 5;
+	%object.createPolygonBoxCollisionShape();
+	%object.Image = "MoveToToy:checkered";
+	%object.Frame = getRandom(0,55);
+	SandboxScene.add( %object );
+}
+
+function MoveToToy::createHeart1( %this )
+{
+	%object = new Sprite()
+	{
+    	class = "heart1";
+	};
+	%object.BodyType = static;
+	%object.Position = "-24 31";
+	%object.Layer = 30;
+	%object.Size = 5 SPC 3.75 ;	
+	%object.Image = "MoveToToy:heart";	
+	SandboxScene.add( %object );
+}
+
+function MoveToToy::createHeart2( %this )
+{
+	%object = new Sprite()
+	{
+    	class = "heart2";
+	};
+	%object.BodyType = static;
+	%object.Position = "-18 31";
+	%object.Layer = 30;
+	%object.Size = 5 SPC 3.75 ;	
+	%object.Image = "MoveToToy:heart";	
+	SandboxScene.add( %object );
+}
+
+function MoveToToy::createHeart3( %this )
+{
+	%object = new Sprite()
+	{
+    	class = "heart3";
+	};
+	%object.BodyType = static;
+	%object.Position = "-12 31";
+	%object.Layer = 30;
+	%object.Size = 5 SPC 3.75 ;	
+	%object.Image = "MoveToToy:heart";	
+	SandboxScene.add( %object );
+}
+
+function MoveToToy::createHeart10( %this )
+{
+	%object = new Sprite()
+	{
+    	class = "heart3";
+	};
+	%object.BodyType = static;
+	%object.Position = "-24 31";
+	%object.Layer = 30;
+	%object.BlendColor = Black;
+	%object.Size = 5 SPC 3.75 ;	
+	%object.Image = "MoveToToy:heart";	
+	SandboxScene.add( %object );
+}
+
+function MoveToToy::createHeart20( %this )
+{
+	%object = new Sprite()
+	{
+    	class = "heart3";
+	};
+	%object.BodyType = static;
+	%object.Position = "-18 31";
+	%object.Layer = 30;
+	%object.BlendColor = Black;
+	%object.Size = 5 SPC 3.75 ;	
+	%object.Image = "MoveToToy:heart";	
+	SandboxScene.add( %object );
+}
+
+function MoveToToy::createHeart30( %this )
+{
+	%object = new Sprite()
+	{
+    	class = "heart3";
+	};
+	%object.BodyType = static;
+	%object.Position = "-12 31";
+	%object.Layer = 30;
+	%object.BlendColor = Black;
+	%object.Size = 5 SPC 3.75 ;	
+	%object.Image = "MoveToToy:heart";	
+	SandboxScene.add( %object );
+}
+
+function EndBox::onCollision( %this, %object, %collisionDetails )
+{
+	%this.count++; 	
+	if (%this.count >= 5)
+	{
+    	switch(MoveToToy.livesLeft)
+    	{
+        	case 3:
+            	MoveToToy.createHeart30();
+        	case 2:
+            	MoveToToy.createHeart20();
+        	case 1:
+            	MoveToToy.createHeart10();
+        	case 0:
+            	exitGame(); //Make this
+        	default:
+            	nope();
+    	}           	
+    	MoveToToy.livesLeft--;
+    	%this.count = 0;
+	}
+}
+
+
 //-----------------------------------------------------------------------------
 
 function MoveToToy::reset( %this )
@@ -57,6 +187,24 @@ function MoveToToy::reset( %this )
     SandboxScene.clear();
 
     %this.Score = 0;
+    %this.createEndBox();
+	%this.createHeart1();  
+	%this.createHeart2();
+	%this.createHeart3();
+
+	//Add health text
+	new TextSprite()
+	{
+    	Scene = SandboxScene;
+    	Font = "ToyAssets:ArialFont";
+    	FontSize = 3;
+    	Text = "LIVES LEFT - ";
+    	Position = "0 25";
+    	Size = "90 15";
+    	OverflowModeY = "visible";
+    	BlendColor = "255 0 0 1";
+	};
+
     
     // Create background.
     %this.createBackground();
